@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">VX-2000 Cam</string>
+    <string name="title_activity_main">VX-2000 Cam</string>
+    <string name="package_name">com.harper.vx2000cam</string>
+    <string name="custom_url_scheme">com.harper.vx2000cam</string>
+</resources>
