@@ -6,6 +6,7 @@ interface Props {
   isRecording: boolean;
   recordingSeconds: number;
   batteryPercent: number;
+  hudMessage?: string | null;
 }
 
 export const OSDOverlay: React.FC<Props> = ({
@@ -13,6 +14,7 @@ export const OSDOverlay: React.FC<Props> = ({
   isRecording,
   recordingSeconds,
   batteryPercent,
+  hudMessage,
 }) => {
   const [frameTick, setFrameTick] = useState(0);
   const [blink, setBlink] = useState(true);
@@ -111,6 +113,14 @@ export const OSDOverlay: React.FC<Props> = ({
 
       {/* Center Reticle & NightShot Indicator */}
       <div className="flex flex-col items-center justify-center my-auto">
+        {hudMessage && (
+          <div className="bg-black/90 border-2 border-amber-400 px-4 py-2 rounded shadow-[0_0_15px_rgba(255,191,0,0.7)] mb-3 text-center animate-pulse">
+            <span className="text-amber-300 text-xs font-black tracking-widest block">
+              💾 {hudMessage}
+            </span>
+          </div>
+        )}
+
         {config.nightShot && (
           <div className="bg-emerald-950/90 border border-emerald-400 px-3 py-1 rounded shadow-[0_0_12px_rgba(0,255,102,0.6)] mb-4 text-center">
             <span className="text-emerald-300 text-xs font-black tracking-widest block">

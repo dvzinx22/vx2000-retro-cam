@@ -10,6 +10,7 @@ interface Props {
   isRecording: boolean;
   recordingSeconds: number;
   batteryPercent: number;
+  hudMessage?: string | null;
   onCanvasReady: (canvas: HTMLCanvasElement) => void;
 }
 
@@ -18,6 +19,7 @@ export const Viewfinder: React.FC<Props> = ({
   isRecording,
   recordingSeconds,
   batteryPercent,
+  hudMessage,
   onCanvasReady,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -98,6 +100,7 @@ export const Viewfinder: React.FC<Props> = ({
         isRecording={isRecording}
         recordingSeconds={recordingSeconds}
         batteryPercent={batteryPercent}
+        hudMessage={hudMessage}
       />
 
       {/* CRT Glass Reflection Glare */}

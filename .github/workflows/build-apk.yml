@@ -3,7 +3,12 @@ name: Build Android APK
 on:
   push:
     branches: [ master, main ]
+    tags:
+      - 'v*'
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -49,3 +54,20 @@ jobs:
           name: vx2000-retro-cam-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 14
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: android/app/build/outputs/apk/debug/app-debug.apk
+          name: VX-2000 Retro Cam ${{ github.ref_name }}
+          body: |
+            ### 📼 VX-2000 Retro Cam ${{ github.ref_name }}
+            
+            **Novedades de esta versión:**
+            - 💾 **Guardado directo en la Galería:** Las fotos y videos capturados ahora se guardan automáticamente en la galería nativa de Android (DCIM / Álbum VX2000) y en Documentos.
+            - 💾 **Botón "GUARDAR EN GALERÍA":** En el deck de cintas MiniDV puedes volver a guardar o descargar cualquier clip con un solo toque.
+            - 🔔 **Retro HUD Notificaciones:** Cartel OSD en el monitor CRT confirmando cuando un video o foto ha sido guardado.
+            - ⚙️ **Ajustes:** Opción en el menú SETUP para activar/desactivar el guardado automático.
+          draft: false
+          prerelease: false

@@ -6,6 +6,7 @@ import { CassetteDeckModal } from './components/CassetteDeckModal';
 import { SettingsModal } from './components/SettingsModal';
 import { retroAudioProcessor } from './services/RetroAudioProcessor';
 import { canvasVideoRecorder } from './services/CanvasVideoRecorder';
+import { galleryService } from './services/GalleryService';
 
 export const App: React.FC = () => {
   const [config, setConfig] = useState<CameraConfig>({
@@ -22,6 +23,7 @@ export const App: React.FC = () => {
     tapeMinutesLeft: 58,
     vintageYear: 2000,
     vintageDate: 'OCT 18 2000',
+    autoSaveToGallery: true,
   });
 
   const [isRecording, setIsRecording] = useState(false);
@@ -30,8 +32,16 @@ export const App: React.FC = () => {
   const [clips, setClips] = useState<RecordedMedia[]>([]);
   const [isDeckOpen, setIsDeckOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [hudMessage, setHudMessage] = useState<string | null>(null);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  const showHudMessage = useCallback((msg: string) => {
+    setHudMessage(msg);
+    setTimeout(() => {
+      setHudMessage((prev) => (prev === msg ? null : prev));
+    }, 2800);
+  }, []);
 
   // Recording second ticker
   useEffect(() => {
@@ -72,18 +82,30 @@ export const App: React.FC = () => {
       try {
         const media = await canvasVideoRecorder.stopRecording(config);
         setClips((prev) => [media, ...prev]);
+
+        if (config.autoSaveToGallery) {
+          galleryService.saveMedia(media).then((res) => {
+            showHudMessage(res.success ? 'VIDEO GUARDADO EN GALERÍA' : 'ERROR AL GUARDAR VIDEO');
+          });
+        }
       } catch (err) {
         console.error('Stop recording error:', err);
       }
     }
-  }, [isRecording, config]);
+  }, [isRecording, config, showHudMessage]);
 
   const handleTakeSnapshot = useCallback(async () => {
     if (!canvasRef.current) return;
     retroAudioProcessor.playBeep(2600, 0.08, 'triangle');
     const photo = await canvasVideoRecorder.takeSnapshot(canvasRef.current, config);
     setClips((prev) => [photo, ...prev]);
-  }, [config]);
+
+    if (config.autoSaveToGallery) {
+      galleryService.saveMedia(photo).then((res) => {
+        showHudMessage(res.success ? 'FOTO GUARDADA EN GALERÍA' : 'ERROR AL GUARDAR FOTO');
+      });
+    }
+  }, [config, showHudMessage]);
 
   const handleDeleteClip = useCallback((id: string) => {
     setClips((prev) => prev.filter((c) => c.id !== id));
@@ -147,6 +169,7 @@ export const App: React.FC = () => {
           isRecording={isRecording}
           recordingSeconds={recordingSeconds}
           batteryPercent={batteryPercent}
+          hudMessage={hudMessage}
           onCanvasReady={(c) => {
             canvasRef.current = c;
           }}

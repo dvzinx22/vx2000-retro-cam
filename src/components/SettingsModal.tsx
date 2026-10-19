@@ -101,6 +101,32 @@ export const SettingsModal: React.FC<Props> = ({
           </button>
         </div>
 
+        {/* Setting 2.5: Auto Save to Gallery */}
+        <div className="flex items-center justify-between bg-[#191922] p-3 rounded-lg border border-[#2b2b3a]">
+          <div>
+            <span className="text-white text-xs font-bold block">
+              GUARDAR EN GALERÍA AUTOMÁTICO
+            </span>
+            <span className="text-[8.5px] text-gray-400">
+              Guarda fotos y videos en la galería del celular (DCIM / Álbum VX2000)
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              retroAudioProcessor.playBeep(2300, 0.04);
+              onUpdateConfig({ autoSaveToGallery: !config.autoSaveToGallery });
+            }}
+            className={`px-3 py-1 rounded-full text-xs font-bold tracking-wider border transition-all ${
+              config.autoSaveToGallery
+                ? 'bg-emerald-950/80 border-emerald-400 text-emerald-300 shadow-[0_0_8px_rgba(0,255,102,0.4)]'
+                : 'bg-[#242430] border-gray-600 text-gray-400'
+            }`}
+          >
+            {config.autoSaveToGallery ? 'ACTIVADO' : 'MANUAL'}
+          </button>
+        </div>
+
         {/* Setting 3: Grain Intensity */}
         <div className="flex flex-col gap-1 bg-[#191922] p-3 rounded-lg border border-[#2b2b3a]">
           <div className="flex justify-between text-xs">

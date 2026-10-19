@@ -14,6 +14,7 @@ export interface CameraConfig {
   tapeMinutesLeft: number;
   vintageYear: number;
   vintageDate: string;
+  autoSaveToGallery: boolean; // Guardar automáticamente fotos y videos en la galería del móvil
 }
 
 export interface RecordedMedia {

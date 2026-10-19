@@ -43,3 +43,4 @@ android/app/build/
 android/.idea/
 android/*.iml
 android/app/*.iml
+apk-release/

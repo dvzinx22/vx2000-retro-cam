@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { RecordedMedia } from '../types/camera';
 import { retroAudioProcessor } from '../services/RetroAudioProcessor';
-import { Download, Play, Trash2, Video, X } from 'lucide-react';
+import { galleryService } from '../services/GalleryService';
+import { Check, Download, Loader2, Play, Trash2, Video, X } from 'lucide-react';
 
 interface Props {
   isOpen: boolean;
@@ -17,6 +18,8 @@ export const CassetteDeckModal: React.FC<Props> = ({
   onDeleteClip,
 }) => {
   const [selectedClip, setSelectedClip] = useState<RecordedMedia | null>(null);
+  const [savingId, setSavingId] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<{ id: string; text: string; success: boolean } | null>(null);
 
   if (!isOpen) return null;
 
@@ -25,15 +28,25 @@ export const CassetteDeckModal: React.FC<Props> = ({
     setSelectedClip(clip);
   };
 
-  const handleDownload = (clip: RecordedMedia) => {
+  const handleSaveToGallery = async (clip: RecordedMedia, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     retroAudioProcessor.playBeep(2500, 0.05);
-    const a = document.createElement('a');
-    a.href = clip.url;
-    const ext = clip.type === 'video' ? 'webm' : 'jpg';
-    a.download = `vx2000_${clip.type}_${clip.id}.${ext}`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    setSavingId(clip.id);
+
+    try {
+      const res = await galleryService.saveMedia(clip);
+      setSaveStatus({ id: clip.id, text: res.message, success: res.success });
+      if (res.success) {
+        retroAudioProcessor.playBeep(3200, 0.08, 'triangle');
+      }
+    } catch (err) {
+      setSaveStatus({ id: clip.id, text: 'Error al guardar', success: false });
+    } finally {
+      setSavingId(null);
+      setTimeout(() => {
+        setSaveStatus((prev) => (prev?.id === clip.id ? null : prev));
+      }, 3500);
+    }
   };
 
   const handleEject = () => {
@@ -107,11 +120,32 @@ export const CassetteDeckModal: React.FC<Props> = ({
             <div className="flex items-center justify-end gap-2.5 mt-2.5">
               <button
                 type="button"
-                onClick={() => handleDownload(selectedClip)}
-                className="flex items-center gap-1.5 bg-emerald-800 hover:bg-emerald-700 text-white text-[10px] font-bold px-3 py-1.5 rounded active:scale-95"
+                onClick={() => handleSaveToGallery(selectedClip)}
+                disabled={savingId === selectedClip.id}
+                className={`flex items-center gap-1.5 text-white text-[10px] font-bold px-3 py-1.5 rounded active:scale-95 transition-all ${
+                  saveStatus?.id === selectedClip.id
+                    ? saveStatus.success
+                      ? 'bg-emerald-600 text-white shadow-[0_0_10px_#059669]'
+                      : 'bg-red-700 text-white'
+                    : 'bg-emerald-800 hover:bg-emerald-700'
+                }`}
               >
-                <Download size={13} />
-                <span>DESCARGAR</span>
+                {savingId === selectedClip.id ? (
+                  <>
+                    <Loader2 size={13} className="animate-spin" />
+                    <span>GUARDANDO EN GALERÍA...</span>
+                  </>
+                ) : saveStatus?.id === selectedClip.id ? (
+                  <>
+                    {saveStatus.success ? <Check size={13} /> : <X size={13} />}
+                    <span>{saveStatus.text}</span>
+                  </>
+                ) : (
+                  <>
+                    <Download size={13} />
+                    <span>GUARDAR EN GALERÍA</span>
+                  </>
+                )}
               </button>
               <button
                 type="button"
@@ -189,7 +223,24 @@ export const CassetteDeckModal: React.FC<Props> = ({
                   </div>
                 </div>
 
-                <div className="text-amber-400 text-xs">▶</div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    title="Guardar en galería"
+                    onClick={(e) => handleSaveToGallery(clip, e)}
+                    disabled={savingId === clip.id}
+                    className="p-1.5 rounded bg-[#20202c] border border-[#3b3b4f] hover:border-emerald-400 text-gray-300 hover:text-emerald-300 active:scale-90 transition-all"
+                  >
+                    {savingId === clip.id ? (
+                      <Loader2 size={13} className="animate-spin text-amber-400" />
+                    ) : saveStatus?.id === clip.id ? (
+                      <Check size={13} className="text-emerald-400" />
+                    ) : (
+                      <Download size={13} />
+                    )}
+                  </button>
+                  <div className="text-amber-400 text-xs">▶</div>
+                </div>
               </div>
             ))
           )}
