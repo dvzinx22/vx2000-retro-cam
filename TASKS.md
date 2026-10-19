@@ -37,4 +37,4 @@
   - OSD superpuesto: indicador `● REC`, código de tiempo `TC 00:00:00:00`, batería `BATT [■■■□]`, estampa `OCT 18 2000`, escala de zoom y cinta `SP 60m`.
   - Dial físico selector de lentes, interruptor retro NightShot con LED, rocker servoasistido `W <-> T` y botón disparador REC.
 - [x] Configurar **Capacitor** (`capacitor.config.ts`, plataforma Android, permisos de cámara y micrófono en `AndroidManifest.xml`).
-- [ ] Inicializar repositorio Git y subirlo a **GitHub** mediante GitHub CLI (`gh repo create`).
+- [x] Inicializar repositorio Git y subirlo a **GitHub** mediante GitHub CLI (`gh repo create`).
