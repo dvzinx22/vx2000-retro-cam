@@ -24,6 +24,7 @@ export const App: React.FC = () => {
     vintageYear: 2000,
     vintageDate: 'OCT 18 2000',
     autoSaveToGallery: true,
+    recordingFps: 30,
   });
 
   const [isRecording, setIsRecording] = useState(false);
@@ -85,7 +86,7 @@ export const App: React.FC = () => {
 
         if (config.autoSaveToGallery) {
           galleryService.saveMedia(media).then((res) => {
-            showHudMessage(res.success ? 'VIDEO GUARDADO EN GALERÍA' : 'ERROR AL GUARDAR VIDEO');
+            showHudMessage(res.message);
           });
         }
       } catch (err) {
@@ -102,7 +103,7 @@ export const App: React.FC = () => {
 
     if (config.autoSaveToGallery) {
       galleryService.saveMedia(photo).then((res) => {
-        showHudMessage(res.success ? 'FOTO GUARDADA EN GALERÍA' : 'ERROR AL GUARDAR FOTO');
+        showHudMessage(res.message);
       });
     }
   }, [config, showHudMessage]);

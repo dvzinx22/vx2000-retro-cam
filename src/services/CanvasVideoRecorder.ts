@@ -14,8 +14,9 @@ export class CanvasVideoRecorder {
     if (this.isRecording) return;
     this.recordedChunks = [];
 
-    // Capture processed video stream at 30 FPS from WebGL canvas
-    const canvasStream = canvas.captureStream(30);
+    // Capture processed video stream at user-configured FPS (15, 24, 30, 60)
+    const targetFps = config.recordingFps || 30;
+    const canvasStream = canvas.captureStream(targetFps);
 
     // Merge in the processed 2000s band-passed & saturated microphone audio
     const processedAudioTrack = retroAudioProcessor.getProcessedAudioTrack();
@@ -58,6 +59,7 @@ export class CanvasVideoRecorder {
       }
 
       const durationSeconds = Math.max(1, Math.round((Date.now() - this.recordingStartTime) / 1000));
+      const targetFps = config.recordingFps || 30;
 
       this.mediaRecorder.onstop = () => {
         const mimeType = this.mediaRecorder?.mimeType || 'video/webm';
@@ -73,6 +75,7 @@ export class CanvasVideoRecorder {
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
           lensMode: config.lensMode,
           nightShot: config.nightShot,
+          recordingFps: targetFps,
         };
 
         this.isRecording = false;

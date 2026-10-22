@@ -210,13 +210,16 @@ export class WebGLRetroRenderer {
     const render = (now: number) => {
       if (!this.isRunning) return;
 
+      const config = getConfig();
+      const currentFps = config.recordingFps || 30;
+      const interval = 1000 / currentFps;
+
       const elapsed = now - this.lastFrameTime;
-      if (elapsed >= this.frameInterval) {
-        this.lastFrameTime = now - (elapsed % this.frameInterval);
-        this.renderFrame(videoEl, getConfig());
+      if (elapsed >= interval) {
+        this.lastFrameTime = now - (elapsed % interval);
+        this.renderFrame(videoEl, config);
 
         // Burn OSD into the WebGL canvas if burnOSD is enabled
-        const config = getConfig();
         if (config.burnOSD && osdCanvasOverlay && this.gl) {
           this.burnOSDLayer(osdCanvasOverlay);
         }

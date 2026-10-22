@@ -38,7 +38,18 @@ export class GalleryService {
     }
 
     try {
-      // 1. Check existing albums
+      // 1. Get base albums path
+      let rootPath = '';
+      try {
+        const pathRes = await Media.getAlbumsPath();
+        if (pathRes?.path) {
+          rootPath = pathRes.path;
+        }
+      } catch (pathErr) {
+        console.warn('getAlbumsPath error:', pathErr);
+      }
+
+      // 2. Check existing albums
       const res = await Media.getAlbums();
       const existing = res.albums?.find(
         (a) => a.name.toLowerCase() === this.ALBUM_NAME.toLowerCase()
@@ -48,14 +59,14 @@ export class GalleryService {
         return existing.identifier;
       }
 
-      // 2. Try creating the album
+      // 3. Try creating the album
       try {
         await Media.createAlbum({ name: this.ALBUM_NAME });
       } catch (createErr) {
         console.warn('createAlbum warning:', createErr);
       }
 
-      // 3. Re-check albums
+      // 4. Re-check albums
       const updated = await Media.getAlbums();
       const created = updated.albums?.find(
         (a) => a.name.toLowerCase() === this.ALBUM_NAME.toLowerCase()
@@ -65,29 +76,26 @@ export class GalleryService {
         return created.identifier;
       }
 
-      // 4. Fallback: get albums path directly
-      try {
-        const pathRes = await Media.getAlbumsPath();
-        if (pathRes?.path) {
-          this.albumIdentifier = `${pathRes.path}/${this.ALBUM_NAME}`;
-          return this.albumIdentifier;
-        }
-      } catch (pathErr) {
-        console.warn('getAlbumsPath error:', pathErr);
+      // 5. Construct using root path
+      if (rootPath) {
+        this.albumIdentifier = `${rootPath}/${this.ALBUM_NAME}`;
+        return this.albumIdentifier;
       }
 
       if (updated.albums && updated.albums.length > 0) {
-        return updated.albums[0].identifier;
+        this.albumIdentifier = updated.albums[0].identifier;
+        return this.albumIdentifier;
       }
     } catch (err) {
       console.warn('Error resolving album identifier:', err);
     }
 
-    return '';
+    return this.albumIdentifier || '';
   }
 
   /**
-   * Saves a recorded photo or video to the Android gallery / DCIM / MediaStore.
+   * Saves a recorded photo or video to the Android gallery / DCIM / MediaStore
+   * and directly to internal device storage (Documents/VX2000).
    */
   async saveMedia(media: RecordedMedia): Promise<SaveResult> {
     const isNative = Capacitor.isNativePlatform();
@@ -109,6 +117,7 @@ export class GalleryService {
       const albumId = await this.getOrCreateAlbum();
 
       let gallerySaved = false;
+      let deviceStorageSaved = false;
       let finalFilePath = '';
 
       // Tier 1: Save directly to Android MediaStore/Gallery via Media plugin
@@ -152,7 +161,7 @@ export class GalleryService {
         }
       }
 
-      // Tier 2: Also write a persistent backup in Documents/VX2000
+      // Tier 2: Save directly into device memory (Documents/VX2000) for instant file manager access
       try {
         await Filesystem.writeFile({
           path: `VX2000/${fileName}.${ext}`,
@@ -160,20 +169,32 @@ export class GalleryService {
           directory: Directory.Documents,
           recursive: true,
         });
+        deviceStorageSaved = true;
       } catch (backupErr) {
-        console.warn('Filesystem backup save notice:', backupErr);
+        console.warn('Filesystem Documents storage save notice:', backupErr);
       }
 
-      if (gallerySaved) {
+      if (gallerySaved && deviceStorageSaved) {
+        return {
+          success: true,
+          message: media.type === 'photo' ? 'Foto guardada en Galería y Memoria' : 'Video guardado en Galería y Memoria',
+          filePath: finalFilePath,
+        };
+      } else if (gallerySaved) {
         return {
           success: true,
           message: media.type === 'photo' ? 'Foto guardada en tu Galería' : 'Video guardado en tu Galería',
           filePath: finalFilePath,
         };
-      } else {
+      } else if (deviceStorageSaved) {
         return {
           success: true,
-          message: 'Guardado en Mis Archivos > Documentos > VX2000',
+          message: 'Guardado en Memoria (Documentos > VX2000)',
+        };
+      } else {
+        return {
+          success: false,
+          message: 'Error al escribir en memoria del dispositivo',
         };
       }
     } catch (err: unknown) {

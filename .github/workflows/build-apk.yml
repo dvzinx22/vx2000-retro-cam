@@ -65,9 +65,9 @@ jobs:
             ### 📼 VX-2000 Retro Cam ${{ github.ref_name }}
             
             **Novedades de esta versión:**
-            - 💾 **Guardado directo en la Galería:** Las fotos y videos capturados ahora se guardan automáticamente en la galería nativa de Android (DCIM / Álbum VX2000) y en Documentos.
-            - 💾 **Botón "GUARDAR EN GALERÍA":** En el deck de cintas MiniDV puedes volver a guardar o descargar cualquier clip con un solo toque.
-            - 🔔 **Retro HUD Notificaciones:** Cartel OSD en el monitor CRT confirmando cuando un video o foto ha sido guardado.
-            - ⚙️ **Ajustes:** Opción en el menú SETUP para activar/desactivar el guardado automático.
+            - ⏱️ **Selector de FPS para Video:** Permite cambiar la cadencia de grabación entre 15 FPS (stop-motion lo-fi), 24 FPS (cine analógico), 30 FPS (NTSC MiniDV) y 60 FPS (skate video fluido).
+            - 💾 **Guardado en Galería y Memoria:** Las fotos y videos se guardan directamente en la Galería del teléfono (Álbum VX2000 / DCIM) y en el almacenamiento interno (`Mis Archivos > Documentos > VX2000`).
+            - 📺 **Indicador de FPS en OSD:** El visor CRT y la Cassette Deck ahora reflejan los FPS activos (`30p`, `60p`, `15p`).
+            - 📖 **Documentación Profesional:** Nuevo README oficial con especificaciones matemáticas de shaders y guías de uso.
           draft: false
           prerelease: false

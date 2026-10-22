@@ -65,7 +65,7 @@ export const OSDOverlay: React.FC<Props> = ({
         <div className="flex flex-col gap-0.5">
           <div className="flex items-center gap-1.5 text-xs font-bold tracking-wider">
             <span className="bg-emerald-950/80 text-emerald-400 border border-emerald-500/70 px-1 py-0.5 text-[10px]">
-              {config.tapeFormat}
+              {config.tapeFormat} {config.recordingFps || 30}p
             </span>
             <span className="text-gray-200">
               BATT [{battString}] {batteryPercent}%
@@ -163,7 +163,7 @@ export const OSDOverlay: React.FC<Props> = ({
         <div className="flex flex-col">
           <span className="text-white text-sm font-extrabold tracking-widest">{tcString}</span>
           <span className="text-emerald-300 text-[9px] tracking-wider mt-0.5">
-            1/60 F2.4 0dB AUTO
+            1/60 F2.4 {config.recordingFps || 30}FPS AUTO
           </span>
         </div>
 

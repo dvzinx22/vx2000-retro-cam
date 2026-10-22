@@ -218,7 +218,7 @@ export const CassetteDeckModal: React.FC<Props> = ({
                       )}
                     </div>
                     <span className="text-[9px] text-gray-400">
-                      {clip.type === 'video' ? `VIDEO (${clip.durationSeconds}s)` : 'FOTO CCD'} • {clip.timestamp}
+                      {clip.type === 'video' ? `VIDEO ${clip.recordingFps ? `${clip.recordingFps}FPS ` : ''}(${clip.durationSeconds}s)` : 'FOTO CCD'} • {clip.timestamp}
                     </span>
                   </div>
                 </div>

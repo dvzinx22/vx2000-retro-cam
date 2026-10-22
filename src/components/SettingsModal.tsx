@@ -127,6 +127,48 @@ export const SettingsModal: React.FC<Props> = ({
           </button>
         </div>
 
+        {/* Setting 2.8: Recording FPS (Framerate) */}
+        <div className="flex flex-col gap-1.5 bg-[#191922] p-3 rounded-lg border border-[#2b2b3a]">
+          <div className="flex justify-between items-center">
+            <div>
+              <span className="text-white text-xs font-bold block">
+                CADENCIA DE GRABACIÓN (FPS)
+              </span>
+              <span className="text-[8.5px] text-gray-400">
+                {config.recordingFps === 15
+                  ? '15 FPS • Stop-Motion vintage / Lo-Fi 90s'
+                  : config.recordingFps === 24
+                  ? '24 FPS • Cadencia de Cine Analógico'
+                  : config.recordingFps === 60
+                  ? '60 FPS • Acción fluida Skate MiniDV'
+                  : '30 FPS • Estándar NTSC MiniDV (Por defecto)'}
+              </span>
+            </div>
+            <span className="text-amber-400 text-xs font-black px-2 py-0.5 rounded bg-black/60 border border-amber-400/50">
+              {config.recordingFps || 30} FPS
+            </span>
+          </div>
+          <div className="grid grid-cols-4 gap-2 mt-1">
+            {([15, 24, 30, 60] as const).map((fps) => (
+              <button
+                key={fps}
+                type="button"
+                onClick={() => {
+                  retroAudioProcessor.playBeep(2100, 0.04);
+                  onUpdateConfig({ recordingFps: fps });
+                }}
+                className={`py-1.5 rounded border text-[10.5px] font-bold transition-all ${
+                  (config.recordingFps || 30) === fps
+                    ? 'bg-amber-950/80 border-amber-400 text-amber-300 shadow-[0_0_8px_rgba(255,191,0,0.4)]'
+                    : 'bg-[#1a1a22] border-[#2c2c38] text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                {fps} FPS
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Setting 3: Grain Intensity */}
         <div className="flex flex-col gap-1 bg-[#191922] p-3 rounded-lg border border-[#2b2b3a]">
           <div className="flex justify-between text-xs">

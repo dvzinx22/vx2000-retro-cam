@@ -14,7 +14,8 @@ export interface CameraConfig {
   tapeMinutesLeft: number;
   vintageYear: number;
   vintageDate: string;
-  autoSaveToGallery: boolean; // Guardar automáticamente fotos y videos en la galería del móvil
+  autoSaveToGallery: boolean; // Guardar automáticamente fotos y videos en la galería y memoria
+  recordingFps: 15 | 24 | 30 | 60; // Selector de fotogramas por segundo (FPS)
 }
 
 export interface RecordedMedia {
@@ -26,4 +27,5 @@ export interface RecordedMedia {
   timestamp: string;
   lensMode: LensMode;
   nightShot: boolean;
+  recordingFps?: number;
 }
